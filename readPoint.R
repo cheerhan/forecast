@@ -2,7 +2,6 @@ library(rjson)
 library(dplyr)
 library(tidyr)
 library(httr)
-library(lubridate)
 
 point <- function(hdr,deviceId){
     request<-list(
@@ -19,4 +18,3 @@ point <- function(hdr,deviceId){
     points<-as.data.frame(do.call(rbind, lapply(output$data, as.vector)))
     return(points)
 }
-point(hdr,out$deviceId)
