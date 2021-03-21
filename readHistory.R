@@ -10,12 +10,12 @@ hdr=c('Accept'="application/json, text/plain, */*",
       'Accept-Language'="en,zh-CN;q=0.9,zh;q=0.8,la;q=0.7,ru;q=0.6" ,
       'Authorization'="bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwbHNhZG1pbiIsImVudGVycHJpc2VDb2RlIjoxMDIyLCJ1c2VyRW50ZXJwcmlzZVN0YXR1cyI6MywiYXV0byI6IjAiLCJ1c2VyU3RhdHVzIjoxLCJ1c2VyX25hbWUiOiJwbHNhZG1pbiIsImNvbXBhbnlOYW1lIjpudWxsLCJ1c2VyRnVsbE5hbWUiOiLmma7mtJvmlq_nrqHnkIblkZgiLCJwaG9uZU51bSI6IjE1NjExNDA5NTYyIiwidXNlckxvZ28iOm51bGwsInVzZXJJZCI6IjQ1MTQzNjQ2MzY5MjI4OCIsImF1dGhvcml0aWVzIjpbImFkbWluIl0sImNsaWVudF9pZCI6ImNuZWdyb3VwIiwic2NvcGUiOlsiYWxsIiwicmVhZCIsIndyaXRlIl0sImVudGVycHJpc2VJZCI6IjQ1MTQzNjQ2Nzg4NjU5MiIsImV4cCI6MTkzMTY1NDIzNSwiZW50ZXJwcmlzZUxvZ28iOiJodHRwczovL3Bvd2VyLmNuZWNsb3VkLmNvbS9hcGkvdjMvaW1hZ2VzLzBjMTM3OTczMDI1MDQ2ODY4OGM5M2ZmZmEyZTg3ODU1LmpwZyIsImVudGVycHJpc2VOYW1lIjoi5pmu5p6r5paw6IO95rqQIiwianRpIjoiY2IyMGVlM2YtMmI3NS00MjE0LWE4ZjYtNjdkODIzYWE0M2VkIiwidXNlcm5hbWUiOiJwbHNhZG1pbiJ9.qLK9ocTltrvrd8ameGhd8Sc_hLvAvhbjy8vKmmKdtVA",      'Content-Type'="application/json;charset=UTF-8")
 
-# 1.使用readStation获得所有电站
-# 2.使用readDevice获得某个电站所有206设备，这里之后要加上读type来保证201，206都可以读到。
-# 3.使用readPoint获得设备列表的所有测点。
-# 4.创建单电站所有设备某几个测点request
-# 5.请求request电站某天的历史数据。
-# 6.使用ProcessHistory完成数据整合。
+# 【X】.使用readStation获得所有电站
+# 【X】.使用readDevice获得某个电站所有206、201
+# 【X】.使用readPoint获得设备列表的部分测点。
+# 【 】.创建单电站所有设备某几个测点request。直流功率（NB003），并网功率（NB018），日发电量（NB031)，总累计发发电量（NB034）
+# 【 】.请求request电站某天的历史数据。
+# 【X】.使用ProcessHistory完成数据整合。
 
 ##读devicechart的数据
 request_body <- list(
