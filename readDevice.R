@@ -2,7 +2,6 @@ library(httr)
 
 ##根据stationCode获得deviceId
 device<-function(hdr,stationCode){
-  stationcode<- as.vector(station$stationCode)
   output<-content(GET(url = "https://power.cnecloud.com/api/v3/base/device/devices/prev",
                 add_headers(hdr),
                 query = list("stationCode"=stationCode, "deviceTypeCode" = "206")))
