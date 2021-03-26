@@ -16,5 +16,6 @@ point <- function(hdr,deviceId){
                  add_headers(.headers = hdr))
     output<-content(result)
     points<-as.data.frame(do.call(rbind, lapply(output$data, as.vector)))
+    points<-unnest(points)
     return(points)
 }
