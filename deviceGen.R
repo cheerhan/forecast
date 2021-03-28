@@ -15,15 +15,15 @@ hdr=c('Accept'="application/json, text/plain, */*",
       'Accept-Language'="en,zh-CN;q=0.9,zh;q=0.8,la;q=0.7,ru;q=0.6" ,
       'Authorization'="bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwbHNhZG1pbiIsImVudGVycHJpc2VDb2RlIjoxMDIyLCJ1c2VyRW50ZXJwcmlzZVN0YXR1cyI6MywiYXV0byI6IjAiLCJ1c2VyU3RhdHVzIjoxLCJ1c2VyX25hbWUiOiJwbHNhZG1pbiIsImNvbXBhbnlOYW1lIjpudWxsLCJ1c2VyRnVsbE5hbWUiOiLmma7mtJvmlq_nrqHnkIblkZgiLCJwaG9uZU51bSI6IjE1NjExNDA5NTYyIiwidXNlckxvZ28iOm51bGwsInVzZXJJZCI6IjQ1MTQzNjQ2MzY5MjI4OCIsImF1dGhvcml0aWVzIjpbImFkbWluIl0sImNsaWVudF9pZCI6ImNuZWdyb3VwIiwic2NvcGUiOlsiYWxsIiwicmVhZCIsIndyaXRlIl0sImVudGVycHJpc2VJZCI6IjQ1MTQzNjQ2Nzg4NjU5MiIsImV4cCI6MTkzMTY1NDIzNSwiZW50ZXJwcmlzZUxvZ28iOiJodHRwczovL3Bvd2VyLmNuZWNsb3VkLmNvbS9hcGkvdjMvaW1hZ2VzLzBjMTM3OTczMDI1MDQ2ODY4OGM5M2ZmZmEyZTg3ODU1LmpwZyIsImVudGVycHJpc2VOYW1lIjoi5pmu5p6r5paw6IO95rqQIiwianRpIjoiY2IyMGVlM2YtMmI3NS00MjE0LWE4ZjYtNjdkODIzYWE0M2VkIiwidXNlcm5hbWUiOiJwbHNhZG1pbiJ9.qLK9ocTltrvrd8ameGhd8Sc_hLvAvhbjy8vKmmKdtVA",      'Content-Type'="application/json;charset=UTF-8")
 
-startime<-"2021-03-01T16:00:00Z"
-endtime<-"2021-03-21T15:59:59Z"
+startime<-"2021-03-06T16:00:00Z"
+endtime<-"2021-03-07T15:59:59Z"
 enterpriseid<-"451436467886592"
 stationCode<-"334413357"
 
 # 使用readDevice获得某个电站所有206、201，上海宝山，滁州盼盼
 source('~/R/forecast/readDevice.R')
 device<-device(hdr,station=stationCode)
-
+device<-device[1,]
 #使用readPoint获得设备列表的部分测点。
 source('~/R/forecast/readPoint.R')
 point<-point(hdr,device$deviceId)
@@ -36,5 +36,9 @@ point<-filter(point,devicePointCode %in% points)
 source('~/R/forecast/readHistory.R')
 data<-devicechart(hdr,stationcode=stationCode,device$deviceCode,startime,endtime,point$devicePointId)
 
-lattice::xyplot(NB018~QX002|deviceName,data=data)
+lattice::xyplot(NB031~Time|deviceName,data=data)
 psych::describeBy(data[],group=data$deviceName)
+
+with(data,{plot(nb003~Time,type="l") 
+  points(diff_03~data$Time,col="red")})
+
