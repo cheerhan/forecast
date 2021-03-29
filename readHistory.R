@@ -32,7 +32,11 @@ devicechart<- function(hdr,stationcode,devicefullcode,startime,endtime,devicepoi
   deviceInfo <- select(deviceInfo,2:3)
   names(deviceInfo)<-c("devicefullCode","deviceName")
   deviceInfo$devicefullCode<-as.character(deviceInfo$devicefullCode)
-  
+  if(length(output$data$pointTime)==0){
+    pointData<-deviceInfo
+    pointData<-unnest(pointData)
+    return(pointData)
+  }
   #处理数据时间
   pointTime <- unlist(output$data$pointTime)
   pointTime <- gsub("T|Z","",pointTime)%>%
@@ -42,7 +46,7 @@ devicechart<- function(hdr,stationcode,devicefullcode,startime,endtime,devicepoi
   # pointTime <- as.data.frame(pointTime[rep(seq_len(nrow(pointTime)), each = nrow(device)), ])
   pointTime<-do.call("rbind", replicate(nrow(device), pointTime, simplify = FALSE))
   names(pointTime)<- c("Time")
-
+  
   #处理测点数据
   nbData<-data.frame()
   qxData<-data.frame()
@@ -69,7 +73,8 @@ devicechart<- function(hdr,stationcode,devicefullcode,startime,endtime,devicepoi
       else{ nbData<-bind_cols(nbData,select(do,last_col()))}
     }
   }
-  pointData<-bind_cols(nbData,select(qxData,2:ncol(qxData)))
+  if(ncol(qxData)>2){pointData<-bind_cols(nbData,select(qxData,2:ncol(qxData)))}
+  else{pointData<-nbData}
   pointData<-bind_cols(pointData,pointTime)
   pointData<-left_join(deviceInfo,pointData)
   

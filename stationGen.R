@@ -5,6 +5,8 @@ library(httr)
 library(lubridate)
 library(psych)
 
+#确定一个电站某一天发电量
+
 ##普洛斯的header
 hdr=c('Accept'="application/json, text/plain, */*",
       'Accept-Encoding'="gzip, deflate, br",
@@ -13,22 +15,32 @@ hdr=c('Accept'="application/json, text/plain, */*",
 startime<-"2021-02-28T16:00:00Z"
 endtime<-"2021-03-01T15:59:59Z"
 enterpriseid<-"451436467886592"
-# points<-c("NB018","NB031","NB034","QX002","QX012")
-stationCode<-"334413354"
+points<-c("NB018","NB031","NB034","QX002","QX012")
 
-source('~/R/forecast/readDevice.R')
-device<-device(hdr,station=stationCode)
-    
-#使用readPoint获得设备列表的部分测点
-source('~/R/forecast/readPoint.R')
-point<-point(hdr,device$deviceId)
-point<-filter(point,devicePointCode %in% c("NB031","NB034"))
-    
-#使用readHistory获取测点数据
-source('~/R/forecast/readHistory.R')
-data<-devicechart(hdr,stationcode=stationCode,device$deviceCode,startime,endtime,point$devicePointId)
+# 使用readStation获得所有电站
+source('~/R/forecast/readStation.R')
+station<-station(hdr)
 
-#计算所有逆变器的电量
-sum_31<- data%>% group_by(devicefullCode)%>%summarise(sum_31=max(NB031,na.rm = TRUE),sub_34=max(NB034,na.rm = TRUE)-min(NB034,na.rm = TRUE))
+data<-data.frame()
+for(i in 1:length(station$stationCode)){
+  stationCode<-station$stationCode[i]
+  print(station$stationName[i])
+  
+  source('~/R/forecast/readDevice.R')
+  device<-device(hdr,station=stationCode)
+  
+  #使用readPoint获得设备列表的部分测点
+  source('~/R/forecast/readPoint.R')
+  point<-point(hdr,device$deviceId)
+  point<-filter(point,devicePointCode %in% points)
+  #使用readHistory获取测点数据
+  source('~/R/forecast/readHistory.R')
+  tmp<-devicechart(hdr,stationcode=stationCode,device$deviceCode,startime,endtime,point$devicePointId)
+  data<-bind_rows(data,tmp)
+}
 
-
+#求所有设备nb031的一天最大值
+sum_31<- data%>% group_by(devicefullCode)%>%summarise(sum_31=max(NB031,na.rm = TRUE))
+#根据电站聚合电站一天发电量。
+sum_station<- sum_31%>%separate(devicefullCode,into=c("stationCode","deviceType","deviceMode","deviceNo"),sep="M")
+sum_station<-sum_station%>%group_by(stationCode)%>%summarise(sum_31=sum(sum_31))
