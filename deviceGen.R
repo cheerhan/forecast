@@ -23,12 +23,11 @@ device<-device(hdr,station=stationCode)
 source('~/R/forecast/readPoint.R')
 point<-point(hdr,device$deviceId)
 point<-filter(point,devicePointCode %in% c("NB031","NB034"))
-    
+
 #使用readHistory获取测点数据
 source('~/R/forecast/readHistory.R')
 data<-devicechart(hdr,stationcode=stationCode,device$deviceCode,startime,endtime,point$devicePointId)
 
+
 #计算所有逆变器的电量
 sum_31<- data%>% group_by(devicefullCode)%>%summarise(sum_31=max(NB031,na.rm = TRUE),sub_34=max(NB034,na.rm = TRUE)-min(NB034,na.rm = TRUE))
-
-
