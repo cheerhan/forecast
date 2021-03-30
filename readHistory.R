@@ -30,8 +30,8 @@ devicechart<- function(hdr,stationcode,devicefullcode,startime,endtime,devicepoi
   deviceInfo <- as.data.frame(do.call(rbind, lapply(deviceInfo, as.vector)))
   deviceInfo <- filter(deviceInfo,deviceInfo$deviceCode %in% device$deviceCode)
   deviceInfo <- select(deviceInfo,2:3)
-  names(deviceInfo)<-c("devicefullCode","deviceName")
-  deviceInfo$devicefullCode<-as.character(deviceInfo$devicefullCode)
+  names(deviceInfo)<-c("deviceCode","deviceName")
+  deviceInfo$deviceCode<-as.character(deviceInfo$deviceCode)
   if(length(output$data$pointTime)==0){
     pointData<-deviceInfo
     pointData<-unnest(pointData)
@@ -60,7 +60,7 @@ devicechart<- function(hdr,stationcode,devicefullcode,startime,endtime,devicepoi
       do <- do[rep(seq_len(nrow(do)), each = nrow(device)), ]
       do <- as.data.frame(t(do))
       do <- gather(do)
-      names(do)<-c("devicefullCode",output$data$pointData[[i]]$pointCode)
+      names(do)<-c("deviceCode",output$data$pointData[[i]]$pointCode)
       if(length(qxData)==0){qxData<-do}
       else{ qxData<-bind_cols(qxData,select(do,last_col()))}
     }
@@ -68,7 +68,7 @@ devicechart<- function(hdr,stationcode,devicefullcode,startime,endtime,devicepoi
     else {
       do <- as.data.frame(t(do))
       do <- gather(do)
-      names(do)<-c("devicefullCode",output$data$pointData[[i]]$pointCode)
+      names(do)<-c("deviceCode",output$data$pointData[[i]]$pointCode)
       if(length(nbData)==0){nbData<-do}
       else{ nbData<-bind_cols(nbData,select(do,last_col()))}
     }
@@ -81,7 +81,7 @@ devicechart<- function(hdr,stationcode,devicefullcode,startime,endtime,devicepoi
   pointData<-unnest(pointData)
   pointData<-pointData%>%relocate(Time,.after = deviceName)
   
-  pointData$devicefullCode<-as.factor(pointData$devicefullCode)
+  pointData$deviceCode<-as.factor(pointData$deviceCode)
   pointData$deviceName<-as.factor(pointData$deviceName)
   pointData$Time<-as_datetime(pointData$Time)
   pointData[, 4:ncol(pointData)] <- sapply( pointData[, 4:ncol(pointData)], as.numeric)
