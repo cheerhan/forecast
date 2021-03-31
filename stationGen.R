@@ -5,8 +5,6 @@ library(httr)
 library(lubridate)
 library(psych)
 
-#确定一个电站某一天发电量
-
 ##普洛斯的header
 hdr=c('Accept'="application/json, text/plain, */*",
       'Accept-Encoding'="gzip, deflate, br",
@@ -39,8 +37,17 @@ for(i in 1:length(station$stationCode)){
   data<-bind_rows(data,tmp)
 }
 
-#求所有设备nb031的一天最大值
-sum_31<- data%>% group_by(devicefullCode)%>%summarise(sum_31=max(NB031,na.rm = TRUE))
+#求所有设备一天中nb031的最大值，NB034的最小值，NB034的最大值-最小值
+gen<- data%>% group_by(deviceCode)%>%summarise(deviceName=first(deviceName),max_31=max(NB031,na.rm=TRUE),min_34=min(NB034,na.rm = TRUE),sub_34=max(NB034,na.rm = TRUE)-min(NB034,na.rm = TRUE))
+gen<-gen%>%separate(deviceCode,into=c("stationCode","deviceType","deviceMode","deviceNo"),sep="M")
+gen<-merge(gen,station,by="stationCode")
+gen<-select(gen,c("stationName","stationCapacity","deviceName","max_31","min_34","sub_34"))
+
 #根据电站聚合电站一天发电量。
-sum_station<- sum_31%>%separate(devicefullCode,into=c("stationCode","deviceType","deviceMode","deviceNo"),sep="M")
-sum_station<-sum_station%>%group_by(stationCode)%>%summarise(sum_31=sum(sum_31))
+sum_station<- gen%>%separate(deviceCode,into=c("stationCode","deviceType","deviceMode","deviceNo"),sep="M")
+sum_station<-sum_station%>%group_by(stationCode)%>%summarise(gen_31=sum(max_31),gen_34=sum(sub_34),start_34=sum(min_34))
+sum_station<-merge(sum_station,station,by="stationCode")
+sum_station<-select(sum_station,c("stationName","stationCapacity","gen_31","gen_34","start_34"))
+
+write.xlsx(sum_station, "普洛斯所有电站3月1日电量.xlsx", sheetName = "Sheet1",  col.names = TRUE, row.names = FALSE)
+write.xlsx(gen, "普洛斯所有设备3月1日电量.xlsx", sheetName = "Sheet2",  col.names = TRUE, row.names = FALSE, append = FALSE)

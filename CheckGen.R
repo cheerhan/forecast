@@ -23,7 +23,7 @@ stationCode<-"3344212"
 # 使用readDevice获得某个电站所有206、201，上海宝山，滁州盼盼
 source('~/R/forecast/readDevice.R')
 device<-device(hdr,station=stationCode)
-device<-device[1,]
+ device<-device[1,]
 #使用readPoint获得设备列表的部分测点。
 source('~/R/forecast/readPoint.R')
 point<-point(hdr,device$deviceId)
