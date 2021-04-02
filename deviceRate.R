@@ -14,41 +14,30 @@ startime<-"2021-02-28T16:00:00Z"
 endtime<-"2021-03-31T15:59:59Z"
 enterpriseid<-"451436467886592"
 #滁州盼盼
-stationCode<-"334413353"
+stationCode<-"3344124"
 
 source('~/R/forecast/readDevice.R')
 device<-device(hdr,station=stationCode)
-    
+
 #使用readPoint获得设备列表的部分测点
 source('~/R/forecast/readPoint.R')
 point<-point(hdr,device$deviceId)
-point<-filter(point,devicePointCode %in% c("NB031","NB034"))
+point<-filter(point,devicePointCode %in% c("NB003","NB018","NB031","NB034"))
 
-#使用readHistory获取测点数据
-source('~/R/forecast/readHistory.R')
-data<-devicechart(hdr,stationcode=stationCode,device$deviceCode,startime,endtime,point$devicePointId)
-
-#计算所有逆变器的电量
-sum_31<- data%>% group_by(deviceCode)%>%summarise(max_31=max(NB031,na.rm = TRUE),sub_34=max(NB034,na.rm = TRUE)-min(NB034,na.rm = TRUE))
-sum_31<- data%>% group_by(deviceCode,date=as.Date(as.POSIXct(Time, 'GMT')))%>%summarise(max_31=max(NB031,na.rm = TRUE),sub_34=max(NB034,na.rm = TRUE)-min(NB034,na.rm = TRUE))
 
 source('~/R/forecast/readDevCap.R')
 device<-deviceCap(hdr,stationCode)
 
-gen<-merge(device,sum_31,by="deviceCode")
-gen<-mutate(gen,hour_31=max_31/as.numeric(deviceCapacity))
-gen<-mutate(gen,is.fun=0)
+#使用readHistory获取测点数据
+source('~/R/forecast/readHistory.R')
+data<-devicechart(hdr,stationcode=stationCode,device$deviceCode,startime,endtime,point$devicePointId)
+data<-merge(data,device,by="deviceCode")
+data<-select(data,c("deviceCode","deviceName.x","Time","deviceCapacity","NB003","NB018","NB031","NB034"))
+data<-mutate(data,convert=NB018/NB003,load=NB018/as.numeric(deviceCapacity))
 
-#标记故障设备
-con<-which(outer(gen$deviceName,lossDevice$deviceName,"==") & outer(gen$date,lossDevice$date,"=="),arr.ind=TRUE)
-gen<-within(gen,is.fun[con[,1]]<-1)
+library(lattice)
 
-#计算等效小时数
-mean_hour<-gen %>% group_by(date) %>% filter(is.fun==0)%>%summarise(mean_hour=mean(hour_31))
-gen<-merge(gen,mean_hour,by="date")
+xyplot(convert~load|deviceName.x,data=data,ylim = c(0.9,1))
+pairs(select(data,c("NB003","NB018","convert","load")))
 
-#计算损失电量
-gen<-mutate(gen,loss_gen=case_when(is.fun==1~mean_hour*as.numeric(deviceCapacity)-max_31,TRUE~0))
-
-
-
+             
