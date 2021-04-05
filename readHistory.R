@@ -34,7 +34,7 @@ devicechart<- function(hdr,stationcode,devicefullcode,startime,endtime,devicepoi
   deviceInfo$deviceCode<-as.character(deviceInfo$deviceCode)
   if(length(output$data$pointTime)==0){
     pointData<-deviceInfo
-    pointData<-unnest(pointData)
+    pointData<-unnest(pointData,cols = (deviceName))
     return(pointData)
   }
   #处理数据时间

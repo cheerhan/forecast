@@ -30,6 +30,7 @@ data<-devicechart(hdr,stationcode=stationCode,device$deviceCode,startime,endtime
 
 #计算所有逆变器的电量
 sum_31<- data%>% group_by(deviceCode)%>%summarise(max_31=max(NB031,na.rm = TRUE),sub_34=max(NB034,na.rm = TRUE)-min(NB034,na.rm = TRUE))
+sum_31[sapply(sum_31, is.infinite)] <- NA
 sum_31<- data%>% group_by(deviceCode,date=as.Date(as.POSIXct(Time, 'GMT')))%>%summarise(max_31=max(NB031,na.rm = TRUE),sub_34=max(NB034,na.rm = TRUE)-min(NB034,na.rm = TRUE))
 
 source('~/R/forecast/readDevCap.R')
@@ -38,6 +39,8 @@ device<-deviceCap(hdr,stationCode)
 gen<-merge(device,sum_31,by="deviceCode")
 gen<-mutate(gen,hour_31=max_31/as.numeric(deviceCapacity))
 gen<-mutate(gen,is.fun=0)
+
+#lossDevice是按日标记的故障设备，需要从别的地方来。o(╯□╰)o
 
 #标记故障设备
 con<-which(outer(gen$deviceName,lossDevice$deviceName,"==") & outer(gen$date,lossDevice$date,"=="),arr.ind=TRUE)
