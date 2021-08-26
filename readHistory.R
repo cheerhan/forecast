@@ -4,15 +4,16 @@ library(tidyr)
 library(httr)
 library(lubridate)
 
-devicechart<- function(hdr,stationcode,devicefullcode,startime,endtime,devicepoints,enterpriseid="451436467886592"){
+devicechart<- function(hdr,stationcode,devicefullcode,startime,endtime,devicepoints,enterpriseid="316603493269504"){
   #创建request电站某天的逆变器的历史数据。
   request_body <- list(
-    stationCode="3344112",
+    stationCode=stationcode,
     deviceFullCodes=as.vector(devicefullcode),
     startTime=startime,
     endTime=endtime,
     devicePoints=as.vector(devicepoints),
-    timeInterval="10",
+    #5为5秒，2为1分钟，10为10分钟
+    timeInterval="5",
     devicePoint="[]",
     enterpriseId=enterpriseid
   )

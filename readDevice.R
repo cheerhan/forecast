@@ -10,6 +10,10 @@ device<-function(hdr,stationCode){
                       add_headers(hdr),
                       query = list("stationCode"=stationCode, "deviceTypeCode" = "201")))
   device <- rbind(device,as.data.frame(do.call(rbind, lapply(output$data, as.vector))))
+  output<-content(GET(url = "https://power.cnecloud.com/api/v3/base/device/devices/prev",
+                      add_headers(hdr),
+                      query = list("stationCode"=stationCode, "deviceTypeCode" = "101")))
+  device <- rbind(device,as.data.frame(do.call(rbind, lapply(output$data, as.vector))))
   return(device)
 }
 

@@ -6,7 +6,7 @@ library(httr)
 point <- function(hdr,deviceId){
     request<-list(
       deviceIds=deviceId,
-      devicePointTypes=c("YM","YC"),
+      devicePointTypes=c("YM","YC","YX","Event","YXS"),
       showWeather=1
     )
     request <- toJSON(request)
