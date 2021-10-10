@@ -1,4 +1,4 @@
-library(rjson)
+library(jsonlite)
 library(dplyr)
 library(tidyr)
 library(httr)
@@ -15,7 +15,7 @@ station<- function(hdr){
     regionName="全部区域"
   )
   ##Converting the Request body(Dataframe) to Request body(JSON)
-  station_requst <- toJSON(station_requst)
+  station_requst <- jsonlite::toJSON(station_requst,auto_unbox = TRUE)
   result<-POST("https://power.cnecloud.com/api/v3/pv/monitor/stations",
                body=station_requst,
                content_type_json(),
